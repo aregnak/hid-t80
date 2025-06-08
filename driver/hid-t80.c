@@ -1,3 +1,4 @@
+#include <linux/input-event-codes.h>
 #include <linux/module.h>
 #include <linux/hid.h>
 #include <linux/input.h>
@@ -11,20 +12,21 @@ static int t80_input_configured(struct hid_device *hdev, struct hid_input *hidin
 {
     struct input_dev *input = hidinput->input;
 
-    /* Clear existing EV_ABS settings */
+    // Clear existing EV_ABS settings 
     __clear_bit(EV_ABS, input->evbit);
+    memset(input->evbit, 0, sizeof(input->evbit));
     memset(input->absbit, 0, sizeof(input->absbit));
 
-    /* Set up proper racing wheel axes */
-    input_set_abs_params(input, ABS_WHEEL, 0, 65535, 0, 0);
-    input_set_abs_params(input, ABS_GAS, 0, 65535, 0, 0);
-    input_set_abs_params(input, ABS_BRAKE, 0, 65535, 0, 0);
+    // Set up proper racing wheel axes
+    input_set_abs_params(input, ABS_X, 0, 65535, 0, 0);
+    input_set_abs_params(input, ABS_Y, 65535, 0, 0, 0);
+    input_set_abs_params(input, ABS_Z, 65535, 0, 0, 0);
 
-    /* Enable necessary event types */
+    // Enable necessary event types
     __set_bit(EV_ABS, input->evbit);
     __set_bit(EV_KEY, input->evbit);
 
-    /* Add some basic buttons */
+    // Buttons
     __set_bit(BTN_A, input->keybit);
     __set_bit(BTN_B, input->keybit);
 
@@ -40,7 +42,7 @@ static int t80_raw_event(struct hid_device *hdev, struct hid_report *report,
     u16 steering, gas, brake;
     u8 buttons;
 
-    /* Basic sanity checks */
+    // Basic sanity checks
     if (size < 49)
         return 0;
 
@@ -49,24 +51,20 @@ static int t80_raw_event(struct hid_device *hdev, struct hid_report *report,
         return -ENODEV;
     }
 
-    /* Get the first input device */
+    // Get the first input device
     hidinput = list_first_entry(&hdev->inputs, struct hid_input, list);
     input = hidinput->input;
 
-    /* Parse steering and pedals - manual little-endian conversion */
-    steering = (data[44] << 8) | data[43];
-    gas      = (data[46] << 8) | data[45];
-    brake    = (data[48] << 8) | data[47];
+    // Parse steering and pedals - manual little-endian conversion
+    steering = (s16)((data[44] << 8) | data[43]);
+    gas = (data[46] << 8) | data[45];     // Full 16-bit throttle
+    brake = (data[48] << 8) | data[47];   // Full 16-bit brake
     buttons  = data[6];
 
-    // Debug output 
-    hid_dbg(hdev, "Steering: 0x%04x (%u) | Gas: 0x%04x (%u) | Brake: 0x%04x (%u) | Buttons: 0x%02x\n",
-           steering, steering, gas, gas, brake, brake, buttons);
-
-    /* Send input events */
-    input_report_abs(input, ABS_WHEEL, steering);
-    input_report_abs(input, ABS_GAS, gas);
-    input_report_abs(input, ABS_BRAKE, brake);
+    // Send input events 
+    input_report_abs(input, ABS_X, steering);
+    input_report_abs(input, ABS_Y, gas);
+    input_report_abs(input, ABS_Z, brake);
     input_sync(input);
 
     return 0;
