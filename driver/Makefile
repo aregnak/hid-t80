@@ -15,6 +15,10 @@ load:
 unload:
 	sudo rmmod hid-t80
 
+reload:
+	sudo rmmod hid-t80
+	sudo insmod hid-t80.ko
+
 install: default
 	sudo insmod hid-t80 || true
 	sudo mkdir -p /lib/modules/$(shell uname -r)/kernel/drivers/hid || true
