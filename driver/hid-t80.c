@@ -16,6 +16,7 @@ static int t80_input_configured(struct hid_device *hdev, struct hid_input *hidin
     __clear_bit(EV_ABS, input->evbit);
     memset(input->evbit, 0, sizeof(input->evbit));
     memset(input->absbit, 0, sizeof(input->absbit));
+    //memset(input->keybit, 0, sizeof(input->keybit));
 
     // Set up proper racing wheel axes
     input_set_abs_params(input, ABS_X, 0, 65535, 0, 0);
@@ -84,22 +85,22 @@ static int t80_raw_event(struct hid_device *hdev, struct hid_report *report,
     u8 b5 = data[5], b6 = data[6], b7 = data[7], b8 = data[8], b9 = data[9];
 
     // Face buttons
-    input_report_key(input, BTN_SOUTH, b5 & 0x20); // Cross
-    input_report_key(input, BTN_EAST,  b5 & 0x40); // Circle
-    input_report_key(input, BTN_WEST,  b5 & 0x10); // Square
+    input_report_key(input, BTN_EAST, b5 & 0x20); // Cross
+    input_report_key(input, BTN_TL,  b5 & 0x40); // Circle
+    input_report_key(input, BTN_SOUTH,  b5 & 0x10); // Square
     input_report_key(input, BTN_NORTH, b5 & 0x80); // Triangle
 
     // Shift paddles
-    input_report_key(input, BTN_TL,    b6 & 0x01); // Shift down
+    input_report_key(input, BTN_WEST,    b6 & 0x01); // Shift down
     input_report_key(input, BTN_TR,    b6 & 0x02); // Shift up
 
     // L2 & R2 buttons
-    input_report_key(input, BTN_TL2,  (b6 & 0x04) && b8); // L2
-    input_report_key(input, BTN_TR2,  (b6 & 0x08) && b9); // R2
+    input_report_key(input, BTN_TL2,   b6 & 0x04); // L2
+    input_report_key(input, BTN_TR2,   b6 & 0x08); // R2
 
     // Back buttons
-    input_report_key(input, BTN_THUMBL, b6 & 0x40); // L3
-    input_report_key(input, BTN_THUMBR, b6 & 0x80); // R3
+    input_report_key(input, BTN_THUMBL, (b6 & 0x40) && (b8 == 0xff)); // L3
+    input_report_key(input, BTN_THUMBR, (b6 & 0x80) && (b9 == 0xff)); // R3
 
     // Start button
     input_report_key(input, BTN_START, b7 & 0x01);
@@ -109,7 +110,7 @@ static int t80_raw_event(struct hid_device *hdev, struct hid_report *report,
     input_report_key(input, BTN_DPAD_DOWN,  b6 & 0x10);
     input_sync(input);
 
-    return 0;
+    return 1;
 }
 
 static struct hid_driver t80_driver = {
