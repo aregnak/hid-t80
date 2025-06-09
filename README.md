@@ -77,4 +77,4 @@ and the pedal mapping is off due to the `ABS` input given.
 
 ## Thank you!
 
-This is very WIP, any contribution, even testing and reporting is appreciated!
+This is very WIP, any contribution, even testing and reporting, is appreciated!
