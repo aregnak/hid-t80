@@ -27,8 +27,23 @@ static int t80_input_configured(struct hid_device *hdev, struct hid_input *hidin
     __set_bit(EV_KEY, input->evbit);
 
     // Buttons
-    __set_bit(BTN_A, input->keybit);
-    __set_bit(BTN_B, input->keybit);
+    __set_bit(BTN_SOUTH,  input->keybit); // Cross
+    __set_bit(BTN_EAST,   input->keybit); // Circle
+    __set_bit(BTN_WEST,   input->keybit); // Square
+    __set_bit(BTN_NORTH,  input->keybit); // Triangle
+
+    __set_bit(BTN_TL,     input->keybit); // Shift down
+    __set_bit(BTN_TR,     input->keybit); // Shift up
+    __set_bit(BTN_TL2,    input->keybit); // L2
+    __set_bit(BTN_TR2,    input->keybit); // R2
+
+    __set_bit(BTN_THUMBL, input->keybit); // L3
+    __set_bit(BTN_THUMBR, input->keybit); // R3
+
+    __set_bit(BTN_START,  input->keybit); // Start
+
+    __set_bit(BTN_DPAD_UP,    input->keybit); // D-pad Up
+    __set_bit(BTN_DPAD_DOWN,  input->keybit); // D-pad Down
 
     hid_info(hdev, "T80 racing wheel configured\n");
     return 0;
@@ -65,6 +80,33 @@ static int t80_raw_event(struct hid_device *hdev, struct hid_report *report,
     input_report_abs(input, ABS_X, steering);
     input_report_abs(input, ABS_Y, gas);
     input_report_abs(input, ABS_Z, brake);
+
+    u8 b5 = data[5], b6 = data[6], b7 = data[7], b8 = data[8], b9 = data[9];
+
+    // Face buttons
+    input_report_key(input, BTN_SOUTH, b5 & 0x20); // Cross
+    input_report_key(input, BTN_EAST,  b5 & 0x40); // Circle
+    input_report_key(input, BTN_WEST,  b5 & 0x10); // Square
+    input_report_key(input, BTN_NORTH, b5 & 0x80); // Triangle
+
+    // Shift paddles
+    input_report_key(input, BTN_TL,    b6 & 0x01); // Shift down
+    input_report_key(input, BTN_TR,    b6 & 0x02); // Shift up
+
+    // L2 & R2 buttons
+    input_report_key(input, BTN_TL2,  (b6 & 0x04) && b8); // L2
+    input_report_key(input, BTN_TR2,  (b6 & 0x08) && b9); // R2
+
+    // Back buttons
+    input_report_key(input, BTN_THUMBL, b6 & 0x40); // L3
+    input_report_key(input, BTN_THUMBR, b6 & 0x80); // R3
+
+    // Start button
+    input_report_key(input, BTN_START, b7 & 0x01);
+
+    // D-Pad ?
+    input_report_key(input, BTN_DPAD_UP,    b6 & 0x20);
+    input_report_key(input, BTN_DPAD_DOWN,  b6 & 0x10);
     input_sync(input);
 
     return 0;
