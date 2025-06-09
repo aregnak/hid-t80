@@ -63,6 +63,13 @@ make unload
 make uninstall
 ```
 
+### Steam Settings
+To use on steam, make sure to `disable steam input` for correct inputs. 
+
+```
+Right-click the game -> Properties -> Controller -> Override for GAME (Disable steam input)
+```
+
 ## Status and Compatibility
 ### Game Tests
 
