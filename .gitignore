@@ -1,6 +1,7 @@
 # build files
 *.cmd
 *.o
+*.o.d
 *.ko
 *.mod
 *.mod.*
