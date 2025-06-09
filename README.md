@@ -1,4 +1,4 @@
-	# Linux kernel module for Thrustmaster T80 (EXPERIMENTAL)
+# Linux kernel module for Thrustmaster T80 (EXPERIMENTAL)
 
 > **DISCLAIMER:** The module is not completed! It is only partially
 > functional! As of now, only steering, pedals, shifting, and face 
