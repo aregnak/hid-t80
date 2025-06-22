@@ -28,6 +28,7 @@ static int t80_input_configured(struct hid_device *hdev, struct hid_input *hidin
     __set_bit(EV_KEY, input->evbit);
 
     // Buttons
+    // The comments next to each mapping is wrong, I'll fix them later.
     __set_bit(BTN_SOUTH,  input->keybit); // Cross
     __set_bit(BTN_EAST,   input->keybit); // Circle
     __set_bit(BTN_WEST,   input->keybit); // Square
@@ -56,7 +57,6 @@ static int t80_raw_event(struct hid_device *hdev, struct hid_report *report,
     struct hid_input *hidinput;
     struct input_dev *input;
     u16 steering, gas, brake;
-    u8 buttons;
 
     // Basic sanity checks
     if (size < 49)
@@ -72,16 +72,17 @@ static int t80_raw_event(struct hid_device *hdev, struct hid_report *report,
     input = hidinput->input;
 
     // Parse steering and pedals - manual little-endian conversion
+    // data[43]-data[48] are all analog outputs, steering, gas, and brake respectively
     steering = (s16)((data[44] << 8) | data[43]);
     gas = (data[46] << 8) | data[45];     // Full 16-bit throttle
     brake = (data[48] << 8) | data[47];   // Full 16-bit brake
-    buttons  = data[6];
 
     // Send input events 
     input_report_abs(input, ABS_X, steering);
     input_report_abs(input, ABS_Y, gas);
     input_report_abs(input, ABS_Z, brake);
 
+    // data[5]-data[9] are all button outputs
     u8 b5 = data[5], b6 = data[6], b7 = data[7], b8 = data[8], b9 = data[9];
 
     // Face buttons
