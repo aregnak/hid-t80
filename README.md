@@ -1,11 +1,14 @@
 # Linux kernel module for Thrustmaster T80 (EXPERIMENTAL)
 
-> **DISCLAIMER:** The module is not completed! It is only partially
+> **DISCLAIMER:** This is not an official Thrustmaster driver,
+> be careful and read through the code of any kernel module you run!
+> I am not responsable for any damaged devices as a result of running
+> this code. Use at your own discretion.
+> 
+> The module is not completed! It is only partially
 > functional! As of now, only steering, pedals, shifting, and face 
 > buttons are functional. The rest of the buttons either partially
-> work or not at all. This is made for fun because there is no native 
-> support for the Thrustmaster T80, so why not try. Any contribution 
-> will help! Thank you for your understanding.
+> work or not at all.
 
 ## Description
 
@@ -84,4 +87,6 @@ and the pedal mapping is off due to the `ABS` input given.
 
 ## Thank you!
 
-This is very WIP, any contribution, even testing and reporting, is appreciated!
+This is made for fun because there is no native 
+support for the Thrustmaster T80, so why not try. Any contribution 
+will help!
